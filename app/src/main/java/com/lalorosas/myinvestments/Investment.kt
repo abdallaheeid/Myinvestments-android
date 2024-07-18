@@ -61,18 +61,25 @@ class InvestmentDBOpenHelper(context: Context,
     fun read(): ArrayList<Investment>? {
         val db = this.readableDatabase
         val cursor = db.rawQuery("SELECT * FROM $TABLE_NAME", null)
-        cursor!! .moveToFirst()
-
+        cursor.moveToFirst()
+    
         val investments = ArrayList<Investment>()
-
-        while(cursor.moveToNext()) {
-            val name = cursor.getString(cursor.getColumnIndex(COLUMN_NAME))
-            val amount = cursor.getFloat(cursor.getColumnIndex(COLUMN_AMOUNT))
-            val investment = Investment(name, amount)
-            investments.add(investment)
+    
+        while (!cursor.isAfterLast) {
+            val nameIndex = cursor.getColumnIndex(COLUMN_NAME)
+            val amountIndex = cursor.getColumnIndex(COLUMN_AMOUNT)
+    
+            if (nameIndex != -1 && amountIndex != -1) {
+                val name = cursor.getString(nameIndex)
+                val amount = cursor.getFloat(amountIndex)
+                val investment = Investment(name, amount)
+                investments.add(investment)
+            }
+    
+            cursor.moveToNext()
         }
         cursor.close()
-
+    
         return investments
     }
 
